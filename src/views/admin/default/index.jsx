@@ -54,7 +54,7 @@ export default function Dashboard() {
       setIsLoading(true);
       setError('');
       
-      const response = await fetch('http://localhost:5001/api/dashboard/analytics');
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/analytics`);
       const data = await response.json();
       
       if (data.success) {
@@ -83,7 +83,7 @@ export default function Dashboard() {
       console.log('Sheet ID:', sheet.id);
       console.log('Sheet storageId:', sheet.storageId);
       
-      const response = await fetch('http://localhost:5001/api/download-answer-sheet', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/download-answer-sheet`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

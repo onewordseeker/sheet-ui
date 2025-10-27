@@ -79,7 +79,7 @@ export default function Settings() {
   const loadSettings = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5001/api/settings', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/settings`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken') || sessionStorage.getItem('authToken')}`,
         },
@@ -137,7 +137,7 @@ export default function Settings() {
         openaiApiKey: settings.openaiApiKey === '••••••••••••••••' ? undefined : settings.openaiApiKey,
       };
 
-      const response = await fetch('http://localhost:5001/api/settings', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/settings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -191,7 +191,7 @@ export default function Settings() {
     setApiTestResult(null);
 
     try {
-      const response = await fetch('http://localhost:5001/api/test-openai-key', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/test-openai-key`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

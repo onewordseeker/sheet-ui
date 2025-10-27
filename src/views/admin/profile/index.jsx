@@ -100,7 +100,7 @@ export default function Profile() {
   const loadUserData = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5001/api/user/profile', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/profile`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken') || sessionStorage.getItem('authToken')}`,
         },
@@ -170,7 +170,7 @@ export default function Profile() {
   const handleSaveProfile = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch('http://localhost:5001/api/user/profile', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -255,7 +255,7 @@ export default function Profile() {
 
     setIsChangingPassword(true);
     try {
-      const response = await fetch('http://localhost:5001/api/user/change-password', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/change-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

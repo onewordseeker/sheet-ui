@@ -139,7 +139,7 @@ export default function Generate() {
       }, 500);
 
       // API call to horizon-ui backend
-      const response = await fetch('http://localhost:5001/api/generate-answers', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/generate-answers`, {
         method: 'POST',
         body: formDataToSend,
       });
@@ -173,7 +173,7 @@ export default function Generate() {
 
   const handleDownload = async (sheetId, sheetName) => {
     try {
-      const response = await fetch('http://localhost:5001/api/download-answer-sheet', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/download-answer-sheet`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

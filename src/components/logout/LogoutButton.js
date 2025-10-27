@@ -12,7 +12,7 @@ export default function LogoutButton({ variant = "ghost", size = "sm", ...props 
       // Call logout API if available
       const token = getToken();
       if (token) {
-        await fetch('http://localhost:5001/api/auth/logout', {
+        await fetch(`${process.env.REACT_APP_API_URL}/api/auth/logout`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

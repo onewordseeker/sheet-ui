@@ -100,7 +100,7 @@ export default function List() {
   const loadAnswerSheets = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5001/api/answer-sheets/history', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/answer-sheets/history`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken') || sessionStorage.getItem('authToken')}`,
         },
@@ -131,7 +131,7 @@ export default function List() {
 
   const handleDownload = async (sheet) => {
     try {
-      const response = await fetch('http://localhost:5001/api/download-answer-sheet', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/download-answer-sheet`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -175,7 +175,7 @@ export default function List() {
   const handleDelete = async (sheet) => {
     if (window.confirm('Are you sure you want to delete this answer sheet? This action cannot be undone.')) {
       try {
-        const response = await fetch(`http://localhost:5001/api/answer-sheets/${sheet.id}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/answer-sheets/${sheet.id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken') || sessionStorage.getItem('authToken')}`,

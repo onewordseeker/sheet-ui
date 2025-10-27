@@ -45,7 +45,7 @@ export default function DownloadSample() {
   const handleDownloadSample = async () => {
     setIsDownloading(true);
     try {
-      const response = await fetch('http://localhost:5001/api/download-sample', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/download-sample`, {
         method: 'GET',
       });
 
