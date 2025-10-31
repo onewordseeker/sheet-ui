@@ -289,7 +289,6 @@ Generate high-quality answer sheets that would be suitable for academic assessme
                     value={settings.numberOfSheets}
                     onChange={(value) => handleInputChange('numberOfSheets', parseInt(value))}
                     min={1}
-                    max={10}
                   >
                     <NumberInputField />
                     <NumberInputStepper>
