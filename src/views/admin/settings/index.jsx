@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
-  Flex,
   FormControl,
   FormLabel,
   Input,
@@ -15,7 +14,6 @@ import {
   Card,
   CardHeader,
   CardBody,
-  Divider,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
@@ -39,7 +37,6 @@ import {
   MdScience,
   MdCheckCircle,
   MdError,
-  MdInfo,
 } from 'react-icons/md';
 
 export default function Settings() {
@@ -50,7 +47,7 @@ export default function Settings() {
     // Generation Settings
     numberOfSheets: 1,
     chatgptModel: 'gpt-4o',
-    customPrompt: '',
+    systemPrompt: '',
     
     // API Settings
     openaiApiKey: '',
@@ -332,8 +329,8 @@ Generate high-quality answer sheets that would be suitable for academic assessme
               <FormControl>
                 <FormLabel>System Prompt for Answer Generation</FormLabel>
                 <Textarea
-                  value={settings.customPrompt || defaultPrompt}
-                  onChange={(e) => handleInputChange('customPrompt', e.target.value)}
+                  value={settings.systemPrompt || ''}
+                  onChange={(e) => handleInputChange('systemPrompt', e.target.value)}
                   rows={8}
                   placeholder={defaultPrompt}
                 />
@@ -341,7 +338,7 @@ Generate high-quality answer sheets that would be suitable for academic assessme
                   This prompt guides the AI in generating answer sheets. Modify it to customize the style and approach.
                 </Text>
                 <Text fontSize="sm" color={textColorSecondary}>
-                  Characters: {settings.customPrompt?.length || defaultPrompt.length}
+                  Characters: {(settings.systemPrompt || '').length}
                 </Text>
               </FormControl>
               
@@ -354,6 +351,15 @@ Generate high-quality answer sheets that would be suitable for academic assessme
                     • Include examples of good answers<br/>
                     • Specify the academic level and subject area<br/>
                     • Mention any special requirements or standards
+                    <br/>
+                    <br/>
+                    <b>Supported tokens:</b><br/>
+                    <code>{'{{persona}}'}</code>: the voice used for variation<br/>
+                    <code>{'{{targetBullets}}'}</code>: exact bullet count to produce<br/>
+                    <code>{'{{sheetNumber}}'}</code>: current sheet index<br/>
+                    <code>{'{{answerFormat}}'}</code>: e.g. bullet-points, paragraph<br/>
+                    <code>{'{{wordCountTarget}}'}</code>: current word count target<br/>
+                    <code>{'{{documentContext}}'}</code>: first 2000 chars of the PDF text
                   </AlertDescription>
                 </Box>
               </Alert>
