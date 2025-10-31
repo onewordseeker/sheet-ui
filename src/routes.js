@@ -18,6 +18,7 @@ import List from 'views/admin/list';
 import Settings from 'views/admin/settings';
 import DownloadSample from 'views/admin/download-sample';
 import Profile from 'views/admin/profile';
+import Candidates from 'views/admin/candidates';
 
 // Auth Imports
 import SignInCentered from 'views/auth/signIn';
@@ -36,6 +37,13 @@ const routes = [
     path: '/generate',
     icon: <Icon as={MdAdd} width="20px" height="20px" color="inherit" />,
     component: <Generate />,
+  },
+  {
+    name: 'Candidates',
+    layout: '/admin',
+    path: '/candidates',
+    icon: <Icon as={MdPerson} width="20px" height="20px" color="inherit" />,
+    component: <Candidates />,
   },
   {
     name: 'History',
