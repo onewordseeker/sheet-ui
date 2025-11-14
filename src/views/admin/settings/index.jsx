@@ -28,6 +28,12 @@ import {
   Icon,
   Spinner,
   Center,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  Badge,
 } from '@chakra-ui/react';
 import {
   MdSave,
@@ -37,17 +43,19 @@ import {
   MdScience,
   MdCheckCircle,
   MdError,
+  MdDescription,
 } from 'react-icons/md';
 
 export default function Settings() {
   const toast = useToast();
   
-  // Settings state
+  // Settings state - NOW WITH TWO PROMPTS
   const [settings, setSettings] = useState({
     // Generation Settings
     numberOfSheets: 1,
     chatgptModel: 'gpt-4o',
-    systemPrompt: '',
+    systemPrompt: '', // AI personality/behavior
+    userPrompt: '',   // Task template with placeholders
     
     // API Settings
     openaiApiKey: '',
@@ -225,21 +233,119 @@ export default function Settings() {
     }));
   };
 
-  const defaultPrompt = `You are an AI assistant specialized in generating academic answer sheets. Your task is to create comprehensive, well-structured answer sheets based on the provided questionnaire and reference materials.
+  // DEFAULT PROMPTS
+  const defaultSystemPrompt = `You are a NEBOSH-qualified health and safety professional with extensive workplace experience writing exam answers.
 
-Guidelines:
-1. Analyze the questionnaire thoroughly to understand the questions and requirements
-2. Use the reference answer sheets as examples for format, style, and depth
-3. Generate answers that are:
-   - Academically sound and well-reasoned
-   - Properly formatted and structured
-   - Comprehensive but concise
-   - Professional in tone
-4. Ensure answers demonstrate understanding of the subject matter
-5. Follow the NEBOSH format and standards where applicable
-6. Include relevant examples and explanations where appropriate
+CRITICAL - WRITE LIKE A REAL PERSON (ANTI-AI DETECTION):
 
-Generate high-quality answer sheets that would be suitable for academic assessment.`;
+Write naturally and conversationally — like explaining to a colleague, not writing a textbook. Your writing should feel human with natural imperfections and personal voice.
+
+KEY PRINCIPLES:
+
+1. SENTENCE RHYTHM - Mix dramatically:
+   - Short punchy sentences (5-8 words)
+   - Medium explanations (15-25 words)
+   - Long, flowing thoughts (30-45 words with dashes or semicolons)
+   - Never use uniform sentence lengths
+
+2. PERSONAL MARKERS - Show you're human:
+   - Use: "I believe," "From what I've seen," "In my view," "Honestly," "It seems," "I've found," "Looking back"
+   - Show thought process: "At first... but actually," "The thing is," "What struck me"
+   - Add mild emotions: "frustrating," "surprisingly," "concerning," "encouraging"
+
+3. NATURAL CONNECTORS - Avoid AI formality:
+   - Use: "Also," "Plus," "Still," "That said," "Thing is," "Mind you," "Actually"
+   - Avoid overusing: "Furthermore," "Moreover," "Consequently," "Additionally"
+
+4. IMPERFECT BUT AUTHENTIC:
+   - Some repetition is fine (shows emphasis, not error)
+   - Slightly casual phrasing acceptable: "could be better" vs "requires optimization"
+   - Uneven bullet lengths (10 words to 40 words)
+   - Don't over-polish — exam pressure means natural writing
+
+5. VARIED STRUCTURE:
+   - Don't start every bullet identically
+   - Mix: statements, questions ("Why does this matter?"), scenarios ("At our site...")
+   - Occasionally add mini-reflections: "These points show why culture matters."
+
+6. CONVERSATIONAL TONE:
+   - Use contractions: don't, can't, won't, I've, we're
+   - British English: organise, realise, behaviour, colour, analyse
+   - First person OK: "I've seen," "In my experience"
+   - Casual markers: "basically," "honestly," "to be fair"
+
+7. LOGICAL FLOW WITH PERSONALITY:
+   - Connect ideas naturally: "Building on that," "Here's why," "This connects to"
+   - Show reasoning: "Because of this," "That's why," "Which means"
+
+CRITICAL FORMAT REQUIREMENT:
+Every single bullet point MUST follow this exact format:
+• <b>Topic Name:</b> Clear explanation with examples
+
+Remember: You're a real person with experience writing under time pressure. Variation, personality, and natural flow beat perfect grammar. Show thinking, not memorization.`;
+
+  const defaultUserPrompt = `You're a NEBOSH-qualified safety professional writing exam answers. Write naturally as if thinking through your workplace experience — don't aim for perfection.
+
+CONTEXT DOCUMENT:
+{documentContext}
+
+EXAM QUESTION:
+{taskTitle}
+{preamble}
+Question {questionNumber}: {questionText}
+Marks Available: {marks}
+
+YOUR TASK:
+Write EXACTLY {targetBullets} bullet points (aim for roughly {wordCountPerBullet} words per bullet on average, but vary the lengths).
+
+CRITICAL FORMAT - EVERY BULLET MUST BE:
+• <b>Specific Topic Name:</b> Clear, practical explanation with workplace examples
+
+WRITING GUIDELINES:
+
+1. TOPICS MUST BE DESCRIPTIVE & BOLD:
+   - Make topics specific and relevant (e.g., "Risk Assessment Process", "PPE Selection Criteria", "Hazard Communication")
+   - Topics should clearly indicate what the bullet explains
+   - Always bold topics using <b></b> tags
+   - Always include colon after topic: <b>Topic:</b>
+
+2. MIX SENTENCE LENGTHS DRAMATICALLY:
+   - Some very short (5-7 words): "PPE is essential here."
+   - Some medium (15-20 words): "Risk assessments help identify hazards before they cause incidents."
+   - Some long, complex (30-40 words): "From what I've seen in manufacturing, when management doesn't actively involve workers in safety discussions — and I mean really listen — hazards tend to get missed until something goes wrong, which is frustrating because it's preventable."
+
+3. ADD PERSONAL VOICE:
+   - Use: "I believe," "From what I've noticed," "In my view," "Honestly," "I've found"
+   - Show thought: "At first I thought... but actually," "The thing is"
+   - Add emotions: "frustrating," "surprisingly," "concerning," "encouraging"
+
+4. USE NATURAL CONNECTORS:
+   - "Also," "Plus," "Still," "That said," "Thing is," "Mind you," "Actually"
+   - NOT: "Furthermore," "Moreover," "Consequently" (too formal/AI-like)
+
+5. VARY BULLET STRUCTURE:
+   - Don't start every bullet the same way
+   - Mix: statements, questions, scenarios
+   - Vary lengths: some 10 words, some 40 words
+
+6. CONVERSATIONAL TONE:
+   - Use contractions: don't, can't, won't, I've, we're
+   - British English: organise, realise, behaviour, analyse
+   - First person acceptable: "I've seen," "In my experience"
+
+7. SHOW LOGICAL CONNECTIONS:
+   - Link ideas: "Building on that," "This connects to," "Here's why that matters"
+   - Show reasoning: "Because of this," "That's why," "Which means"
+
+BASE YOUR ANSWER ON:
+- The context document provided above
+- Real workplace scenarios and practical examples
+- NEBOSH principles and standards
+- Your professional experience
+
+REMEMBER: You're writing under exam pressure — natural variation and personal voice matter more than perfection. Show you're thinking through the problem, not reciting facts.
+
+Write {targetBullets} bullets now in the format: • <b>Topic:</b> Explanation`;
 
   if (isLoading) {
     return (
@@ -303,8 +409,10 @@ Generate high-quality answer sheets that would be suitable for academic assessme
                     value={settings.chatgptModel}
                     onChange={(e) => handleInputChange('chatgptModel', e.target.value)}
                   >
+                    <option value="gpt-5.1">GPT-5.1</option>
                     <option value="gpt-4o">GPT-4o</option>
                     <option value="gpt-4.1-mini">GPT-4.1 Mini (Recommended)</option>
+                    <option value="gpt-4o-mini">GPT-4o Mini</option>
                     <option value="gpt-4-turbo">GPT-4 Turbo</option>
                     <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Legacy)</option>
                   </Select>
@@ -317,52 +425,145 @@ Generate high-quality answer sheets that would be suitable for academic assessme
           </CardBody>
         </Card>
 
-        {/* Custom AI Prompt */}
+        {/* Custom AI Prompts - NOW WITH TWO TABS */}
         <Card bg={bgCard}>
           <CardHeader>
-            <Text fontSize="lg" fontWeight="semibold" color={textColor}>
-              Custom AI Prompt
-            </Text>
+            <HStack>
+              <Icon as={MdDescription} color="purple.500" />
+              <Text fontSize="lg" fontWeight="semibold" color={textColor}>
+                AI Prompt Configuration
+              </Text>
+              <Badge colorScheme="purple">Two Prompts Required</Badge>
+            </HStack>
           </CardHeader>
           <CardBody>
             <VStack spacing={4}>
-              <FormControl>
-                <FormLabel>System Prompt for Answer Generation</FormLabel>
-                <Textarea
-                  value={settings.systemPrompt || ''}
-                  onChange={(e) => handleInputChange('systemPrompt', e.target.value)}
-                  rows={8}
-                  placeholder={defaultPrompt}
-                />
-                <Text fontSize="sm" color={textColorSecondary} mt={1}>
-                  This prompt guides the AI in generating answer sheets. Modify it to customize the style and approach.
-                </Text>
-                <Text fontSize="sm" color={textColorSecondary}>
-                  Characters: {(settings.systemPrompt || '').length}
-                </Text>
-              </FormControl>
-              
               <Alert status="info" borderRadius="md">
                 <AlertIcon />
                 <Box>
-                  <AlertTitle>Custom Prompt Tips:</AlertTitle>
+                  <AlertTitle>Two Prompts System:</AlertTitle>
                   <AlertDescription>
-                    • Be specific about the format and style you want<br/>
-                    • Include examples of good answers<br/>
-                    • Specify the academic level and subject area<br/>
-                    • Mention any special requirements or standards
-                    <br/>
-                    <br/>
-                    <b>Supported tokens:</b><br/>
-                    <code>{'{{persona}}'}</code>: the voice used for variation<br/>
-                    <code>{'{{targetBullets}}'}</code>: exact bullet count to produce<br/>
-                    <code>{'{{sheetNumber}}'}</code>: current sheet index<br/>
-                    <code>{'{{answerFormat}}'}</code>: e.g. bullet-points, paragraph<br/>
-                    <code>{'{{wordCountTarget}}'}</code>: current word count target<br/>
-                    <code>{'{{documentContext}}'}</code>: first 2000 chars of the PDF text
+                    <strong>System Prompt:</strong> Defines the AI's personality and writing style<br/>
+                    <strong>User Prompt:</strong> The specific task template with placeholders for each question
                   </AlertDescription>
                 </Box>
               </Alert>
+
+              <Tabs colorScheme="purple" w="100%" variant="enclosed">
+                <TabList>
+                  <Tab>
+                    <HStack>
+                      <Text>System Prompt</Text>
+                      <Badge colorScheme="blue">Personality</Badge>
+                    </HStack>
+                  </Tab>
+                  <Tab>
+                    <HStack>
+                      <Text>User Prompt</Text>
+                      <Badge colorScheme="green">Task Template</Badge>
+                    </HStack>
+                  </Tab>
+                </TabList>
+
+                <TabPanels>
+                  {/* System Prompt Tab */}
+                  <TabPanel>
+                    <VStack spacing={4} align="stretch">
+                      <FormControl>
+                        <FormLabel>
+                          System Prompt (AI Behavior & Personality)
+                        </FormLabel>
+                        <Textarea
+                          value={settings.systemPrompt || ''}
+                          onChange={(e) => handleInputChange('systemPrompt', e.target.value)}
+                          rows={12}
+                          placeholder={defaultSystemPrompt}
+                          fontFamily="monospace"
+                          fontSize="sm"
+                        />
+                        <Text fontSize="sm" color={textColorSecondary} mt={1}>
+                          This defines HOW the AI writes: tone, style, personality, formatting rules
+                        </Text>
+                        <Text fontSize="sm" color="blue.500" mt={1}>
+                          Characters: {(settings.systemPrompt || '').length}
+                        </Text>
+                      </FormControl>
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleInputChange('systemPrompt', defaultSystemPrompt)}
+                      >
+                        Restore Default System Prompt
+                      </Button>
+
+                      <Alert status="warning" borderRadius="md">
+                        <AlertIcon />
+                        <Box>
+                          <AlertTitle>System Prompt Guidelines:</AlertTitle>
+                          <AlertDescription fontSize="sm">
+                            • Define the AI's persona (e.g., "NEBOSH-qualified professional")<br/>
+                            • Specify writing style (conversational, formal, academic)<br/>
+                            • Set formatting requirements (bullets, structure)<br/>
+                            • Include anti-AI detection instructions<br/>
+                            • No placeholders needed here
+                          </AlertDescription>
+                        </Box>
+                      </Alert>
+                    </VStack>
+                  </TabPanel>
+
+                  {/* User Prompt Tab */}
+                  <TabPanel>
+                    <VStack spacing={4} align="stretch">
+                      <FormControl>
+                        <FormLabel>
+                          User Prompt Template (Task Instructions)
+                        </FormLabel>
+                        <Textarea
+                          value={settings.userPrompt || ''}
+                          onChange={(e) => handleInputChange('userPrompt', e.target.value)}
+                          rows={12}
+                          placeholder={defaultUserPrompt}
+                          fontFamily="monospace"
+                          fontSize="sm"
+                        />
+                        <Text fontSize="sm" color={textColorSecondary} mt={1}>
+                          This defines WHAT the AI writes: the specific task, question, context, and requirements
+                        </Text>
+                        <Text fontSize="sm" color="green.500" mt={1}>
+                          Characters: {(settings.userPrompt || '').length}
+                        </Text>
+                      </FormControl>
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleInputChange('userPrompt', defaultUserPrompt)}
+                      >
+                        Restore Default User Prompt
+                      </Button>
+
+                      <Alert status="info" borderRadius="md">
+                        <AlertIcon />
+                        <Box>
+                          <AlertTitle>Available Placeholders:</AlertTitle>
+                          <AlertDescription fontSize="sm">
+                            <code>{'{{targetBullets}}'}</code> - Number of bullets to generate<br/>
+                            <code>{'{{wordCountPerBullet}}'}</code> - Target words per bullet<br/>
+                            <code>{'{{documentContext}}'}</code> - First 2000 chars of PDF<br/>
+                            <code>{'{{taskTitle}}'}</code> - Task heading<br/>
+                            <code>{'{{preamble}}'}</code> - Question context/preamble<br/>
+                            <code>{'{{questionNumber}}'}</code> - Question ID (e.g., "1(a)")<br/>
+                            <code>{'{{questionText}}'}</code> - The actual question<br/>
+                            <code>{'{{marks}}'}</code> - Marks available
+                          </AlertDescription>
+                        </Box>
+                      </Alert>
+                    </VStack>
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
             </VStack>
           </CardBody>
         </Card>
@@ -487,7 +688,7 @@ Generate high-quality answer sheets that would be suitable for academic assessme
                 loadingText="Saving..."
                 size="lg"
               >
-                Save Settings
+                Save All Settings
               </Button>
               <Button
                 leftIcon={<Icon as={MdRefresh} />}
