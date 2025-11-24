@@ -56,6 +56,8 @@ export default function Settings() {
     chatgptModel: 'gpt-4o',
     systemPrompt: '', // AI personality/behavior
     userPrompt: '',   // Task template with placeholders
+    attachmentSystemPrompt: '',
+    attachmentUserPrompt: '',
     
     // API Settings
     openaiApiKey: '',
@@ -347,6 +349,31 @@ REMEMBER: You're writing under exam pressure — natural variation and personal 
 
 Write {targetBullets} bullets now in the format: • <b>Topic:</b> Explanation`;
 
+  const defaultAttachmentSystemPrompt = `You are a seasoned safety professional who always studies the provided attachments (supporting PDFs, notes, photos, logs) before writing. Prioritize attachment findings, highlight conflicts between attachments and the question paper, and call out missing data when needed. Keep the same bullet formatting rules as the standard system prompt, use British English, and explain how attachments influence each recommendation.`;
+
+  const defaultAttachmentUserPrompt = `ATTACHMENT-AWARE QUESTION:
+
+Primary PDF Context:
+{documentContext}
+
+Attachment Summaries:
+{attachmentsContext}
+
+Task: {taskTitle}
+{preamble}
+Question {questionNumber}: {questionText}
+Marks: {marks}
+
+Write EXACTLY {targetBullets} bullet points (roughly {wordCountPerBullet} words each, but vary lengths) using:
+• <b>Attachment Insight:</b> Practical explanation referencing attachments first, then PDF context
+
+Rules:
+1. Quote or summarise attachment data whenever it exists ("Attachment A photos show...", "The equipment log in Attachment C indicates...").
+2. If attachments contradict the PDF, explain the safer interpretation and why.
+3. If attachments are silent on a point, acknowledge the gap ("We weren't given maintenance records, so I'd confirm that on site.").
+4. Keep tone conversational and human, using British English and varied bullets.
+5. End with concrete, actionable advice tied to the attachments.`;
+
   if (isLoading) {
     return (
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
@@ -425,7 +452,7 @@ Write {targetBullets} bullets now in the format: • <b>Topic:</b> Explanation`;
           </CardBody>
         </Card>
 
-        {/* Custom AI Prompts - NOW WITH TWO TABS */}
+        {/* Custom AI Prompts */}
         <Card bg={bgCard}>
           <CardHeader>
             <HStack>
@@ -433,7 +460,7 @@ Write {targetBullets} bullets now in the format: • <b>Topic:</b> Explanation`;
               <Text fontSize="lg" fontWeight="semibold" color={textColor}>
                 AI Prompt Configuration
               </Text>
-              <Badge colorScheme="purple">Two Prompts Required</Badge>
+              <Badge colorScheme="purple">Standard & Attachment</Badge>
             </HStack>
           </CardHeader>
           <CardBody>
@@ -441,10 +468,10 @@ Write {targetBullets} bullets now in the format: • <b>Topic:</b> Explanation`;
               <Alert status="info" borderRadius="md">
                 <AlertIcon />
                 <Box>
-                  <AlertTitle>Two Prompts System:</AlertTitle>
+                  <AlertTitle>Prompt Families:</AlertTitle>
                   <AlertDescription>
-                    <strong>System Prompt:</strong> Defines the AI's personality and writing style<br/>
-                    <strong>User Prompt:</strong> The specific task template with placeholders for each question
+                    <strong>Standard Prompts:</strong> Used by the regular Generate page<br/>
+                    <strong>Attachment Prompts:</strong> Used by the Attachment Generate page whenever supporting files are uploaded
                   </AlertDescription>
                 </Box>
               </Alert>
@@ -454,13 +481,25 @@ Write {targetBullets} bullets now in the format: • <b>Topic:</b> Explanation`;
                   <Tab>
                     <HStack>
                       <Text>System Prompt</Text>
-                      <Badge colorScheme="blue">Personality</Badge>
+                      <Badge colorScheme="blue">Standard</Badge>
                     </HStack>
                   </Tab>
                   <Tab>
                     <HStack>
                       <Text>User Prompt</Text>
-                      <Badge colorScheme="green">Task Template</Badge>
+                      <Badge colorScheme="green">Standard</Badge>
+                    </HStack>
+                  </Tab>
+                  <Tab>
+                    <HStack>
+                      <Text>Attachment System</Text>
+                      <Badge colorScheme="purple">Attachments</Badge>
+                    </HStack>
+                  </Tab>
+                  <Tab>
+                    <HStack>
+                      <Text>Attachment User</Text>
+                      <Badge colorScheme="pink">Attachments</Badge>
                     </HStack>
                   </Tab>
                 </TabList>
@@ -549,14 +588,87 @@ Write {targetBullets} bullets now in the format: • <b>Topic:</b> Explanation`;
                         <Box>
                           <AlertTitle>Available Placeholders:</AlertTitle>
                           <AlertDescription fontSize="sm">
-                            <code>{'{{targetBullets}}'}</code> - Number of bullets to generate<br/>
-                            <code>{'{{wordCountPerBullet}}'}</code> - Target words per bullet<br/>
-                            <code>{'{{documentContext}}'}</code> - First 2000 chars of PDF<br/>
-                            <code>{'{{taskTitle}}'}</code> - Task heading<br/>
-                            <code>{'{{preamble}}'}</code> - Question context/preamble<br/>
-                            <code>{'{{questionNumber}}'}</code> - Question ID (e.g., "1(a)")<br/>
-                            <code>{'{{questionText}}'}</code> - The actual question<br/>
-                            <code>{'{{marks}}'}</code> - Marks available
+                            <code>{'{targetBullets}'}</code> - Number of bullets to generate<br/>
+                            <code>{'{wordCountPerBullet}'}</code> - Target words per bullet<br/>
+                            <code>{'{documentContext}'}</code> - First portion of the PDF<br/>
+                            <code>{'{taskTitle}'}</code> - Task heading<br/>
+                            <code>{'{preamble}'}</code> - Question context/preamble<br/>
+                            <code>{'{questionNumber}'}</code> - Question ID (e.g., "1(a)")<br/>
+                            <code>{'{questionText}'}</code> - The actual question<br/>
+                            <code>{'{marks}'}</code> - Marks available
+                          </AlertDescription>
+                        </Box>
+                      </Alert>
+                    </VStack>
+                  </TabPanel>
+
+                  {/* Attachment System Prompt Tab */}
+                  <TabPanel>
+                    <VStack spacing={4} align="stretch">
+                      <FormControl>
+                        <FormLabel>Attachment System Prompt</FormLabel>
+                        <Textarea
+                          value={settings.attachmentSystemPrompt || ''}
+                          onChange={(e) => handleInputChange('attachmentSystemPrompt', e.target.value)}
+                          rows={10}
+                          placeholder={defaultAttachmentSystemPrompt}
+                          fontFamily="monospace"
+                          fontSize="sm"
+                        />
+                        <Text fontSize="sm" color={textColorSecondary} mt={1}>
+                          Defines the AI persona when attachments are provided (used only on the Attachment Generate page).
+                        </Text>
+                        <Text fontSize="sm" color="purple.500" mt={1}>
+                          Characters: {(settings.attachmentSystemPrompt || '').length}
+                        </Text>
+                      </FormControl>
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleInputChange('attachmentSystemPrompt', defaultAttachmentSystemPrompt)}
+                      >
+                        Restore Default Attachment System Prompt
+                      </Button>
+                    </VStack>
+                  </TabPanel>
+
+                  {/* Attachment User Prompt Tab */}
+                  <TabPanel>
+                    <VStack spacing={4} align="stretch">
+                      <FormControl>
+                        <FormLabel>Attachment User Prompt</FormLabel>
+                        <Textarea
+                          value={settings.attachmentUserPrompt || ''}
+                          onChange={(e) => handleInputChange('attachmentUserPrompt', e.target.value)}
+                          rows={12}
+                          placeholder={defaultAttachmentUserPrompt}
+                          fontFamily="monospace"
+                          fontSize="sm"
+                        />
+                        <Text fontSize="sm" color={textColorSecondary} mt={1}>
+                          Uses the same placeholders as the standard prompt plus <code>{'{attachmentsContext}'}</code> for combined attachment text.
+                        </Text>
+                        <Text fontSize="sm" color="pink.500" mt={1}>
+                          Characters: {(settings.attachmentUserPrompt || '').length}
+                        </Text>
+                      </FormControl>
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleInputChange('attachmentUserPrompt', defaultAttachmentUserPrompt)}
+                      >
+                        Restore Default Attachment User Prompt
+                      </Button>
+
+                      <Alert status="info" borderRadius="md">
+                        <AlertIcon />
+                        <Box>
+                          <AlertTitle>Attachment Placeholders:</AlertTitle>
+                          <AlertDescription fontSize="sm">
+                            All standard placeholders plus:<br/>
+                            <code>{'{attachmentsContext}'}</code> - Combined extracted text from uploaded attachments
                           </AlertDescription>
                         </Box>
                       </Alert>

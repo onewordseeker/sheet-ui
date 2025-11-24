@@ -9,6 +9,7 @@ import {
   MdSettings,
   MdPerson,
   MdFileDownload,
+  MdAttachment,
 } from 'react-icons/md';
 
 // Admin Imports
@@ -19,6 +20,7 @@ import Settings from 'views/admin/settings';
 import DownloadSample from 'views/admin/download-sample';
 import Profile from 'views/admin/profile';
 import Candidates from 'views/admin/candidates';
+import AttachmentGenerate from 'views/admin/attachment-generate';
 
 // Auth Imports
 import SignInCentered from 'views/auth/signIn';
@@ -37,6 +39,13 @@ const routes = [
     path: '/generate',
     icon: <Icon as={MdAdd} width="20px" height="20px" color="inherit" />,
     component: <Generate />,
+  },
+  {
+    name: 'Attachment Generate',
+    layout: '/admin',
+    path: '/attachment-generate',
+    icon: <Icon as={MdAttachment} width="20px" height="20px" color="inherit" />,
+    component: <AttachmentGenerate />,
   },
   {
     name: 'Candidates',
